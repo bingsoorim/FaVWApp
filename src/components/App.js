@@ -1,16 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppRouter from "./Router";
-// eslint-disable-next-line
 import { authService } from "../myfirebase"
 
 function App() {
-  console.log(authService.currentUser);
-  // eslint-disable-next-line
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [init, setInit] = useState(false); // false by default
+  const [isLoggedIn, setIsLoggedIn] = useState(authService.currentUser);
+  useEffect(() => {
+    authService.onAuthStateChanged((user) => {
+      if (user) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+      setInit(true);
+    });
+  }, []);
   return (
     <>
-      <AppRouter isLoggedIn={isLoggedIn} />
-      <footer>&copy; {new Date().getFullYear()} Your Favourite Vulnerable Web App - SFU CMPT 732</footer>
+      {init ? <AppRouter isLoggedIn={isLoggedIn} /> : "Initializing...."}
+      <footer>&copy; {new Date().getFullYear()} FaVWApp, Your Favourite Vulnerable Web Application</footer>
     </>
   );
 }
